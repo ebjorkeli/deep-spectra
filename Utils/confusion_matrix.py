@@ -21,8 +21,10 @@ def CM(target, pred, glioma=True, save_plot=False, filename='', folder=''):
             plt.xticks(tick_marks, classes, rotation=45)
             plt.yticks(tick_marks, classes)
         for i, j in itertools.product(range(n_classes), range(n_classes)):
-            plt.text(j, i, f'{cm[i, j]} ({cm_norm[i, j] * 100:.1f}%)', horizontalalignment='center',
+            plt.text(j,i, f'{cm[i,j]}' , horizontalalignment='center',
                      color='white' if cm[i, j] > threshold else 'black')
+           # plt.text(j, i, f'{cm[i, j]} ({cm_norm[i, j] * 100:.1f}%)', horizontalalignment='center',
+           #          color='white' if cm[i, j] > threshold else 'black')
         plt.savefig(join(folder, filename))
         plt.clf()
         plt.cla()

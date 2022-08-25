@@ -58,12 +58,13 @@ def main():
         loss, model = trainer.train()
 
         if config['save_model']:
+            folder_name = 'kfold_models/'
             try:
-                save_name = config['run_name'] + '_{}_'.format(k) + config['datetime']
+                save_name = folder_name + config['run_name'] + '_{}_'.format(k) + config['datetime']
                 model.save('{}'.format(save_name))
                 print('Model with weights saved as: {}'.format(save_name))
             except ValueError:
-                save_name = 'saved_weights' + '_{}_'.format(k) + config['datetime'] + '.h5'
+                save_name = folder_name + 'saved_weights' + '_{}_'.format(k) + config['datetime'] + '.h5'
                 model.save_weights(save_name)
                 print('Weights saved as: {}'.format(save_name))
 
@@ -95,12 +96,14 @@ def main():
     result = (model.predict(test_time)[0] > 0.5) * 1
     print('Just healthy accuracy:', np.sum(result) / len(result))
 
-    print('Training data:')
-    pred = model.predict(train_time)
-    evaluate(pred, train_labels, plot_cm=True, name='CM_training', save_pred=True)
-    print('Validation data:')
-    pred = model.predict(val_time)
-    evaluate(pred, val_labels, plot_cm=True, name='CM_validation', save_pred=True)
+    if False:
+        print('Training data:')
+        pred = model.predict(test_time)
+        #pred = model.predict(train_time)
+        evaluate(pred, train_labels, plot_cm=True, name='CM_training', save_pred=True)
+        print('Validation data:')
+        pred = model.predict(val_time)
+        evaluate(pred, val_labels, plot_cm=True, name='CM_validation', save_pred=True)
 
     if config['external_val']:
         # External validation (new set)
