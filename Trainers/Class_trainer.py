@@ -79,8 +79,9 @@ class Trainer:
                 self.w[0:3] = [0,0,0]
                 self.w[-1] = self.weights[-1]
             else:
-                self.w[0:3] = self.weights[0:3]
-                self.w[-1] = 0
+                self.w = self.weights
+                #self.w[0:3] = self.weights[0:3]
+                #self.w[-1] = 0
 
             if self.model_type == 'autoencoder':
                 losses = self.training_loss(prediction, [data[2], data[0]])  ## labels, time_spectra
@@ -105,6 +106,14 @@ class Trainer:
             opt = optimizer[1]
             for layer in self.model.layers[10:14]:
                 layer.trainable = False
+                if epoch % 2 == 0:
+                    a = [21,25]
+                    for aa in a:
+                        self.model.layers[aa].trainable = False
+                else:
+                    a = [15, 16, 18, 19, 22, 23, 26, 27]
+                    for aa in a:
+                        self.model.layers[aa].trainable = False
 
         gradients = tape.gradient(losses, self.model.trainable_variables)
         opt.apply_gradients(zip(gradients, self.model.trainable_variables))
@@ -158,6 +167,7 @@ class Trainer:
                 #print('False negative rate: {}'.format(false_neg_rate(train_labels[:,0], (pred[0] > 0.5)*1)))
                 self.pred_pid, self.pred_mid, self.pred_glioma = np.argmax(pred[1],axis=1), np.argmax(pred[2],axis=1), np.round(pred[0]).ravel()
                 acc_train, cm_pid_train, cm_mid_train = evaluate(pred, train_labels, plot_cm=True, name='CM_train_in_train', pid_cm=True, mid_cm=True, epoch=epoch)
+                del train_time, train_labels, pred, cm_mid_train, cm_pid_train
                 # Internal validation:
                 val_time = np.load(join(self.path, 'validate/validate_time_data.npy'), allow_pickle=True)[:None]
                 val_labels = np.load(join(self.path, 'validate/validate_labels.npy'), allow_pickle=True)[:None]
@@ -165,6 +175,7 @@ class Trainer:
                 pred = self.model.predict(val_time)
                 acc_val = accuracy(pred, val_labels)
                 print('False negative rate: {}'.format(false_neg_rate(val_labels[:,0], (pred[0] > 0.5)*1)))
+                del val_time, val_labels
                 ### EXTERNAL VALIDATION ###
                 '''val_time = np.load(join(self.path, 'nhx/test/test_time_data.npy'), allow_pickle=True)[:None]
                 val_labels = np.load(join(self.path, 'nhx/test/test_labels.npy'), allow_pickle=True)[:None]
@@ -193,11 +204,13 @@ class Trainer:
                             try:
                                 weights = l.get_weights()[0]
                                 tf.summary.histogram('weights_{}'.format(layer_names[i]), weights, step=epoch)
+                                del weights
                             except:
                                 continue
                             try:
                                 biases = l.bias.numpy()
                                 tf.summary.histogram('biases_{}'.format(layer_names[i]), biases, step=epoch)
+                                del biases
                             except:
                                 continue
 
@@ -216,9 +229,13 @@ class Trainer:
                     tf.summary.scalar('mid_ce', train_losses[2], step=epoch)
                     tf.summary.scalar('spec_mse', train_losses[3], step=epoch)
                     tf.summary.scalar('accuracy', acc_train, step=epoch)
+                #del train_losses, acc_train
+
                 with test_summary_writer.as_default():
                     tf.summary.scalar('loss', val_loss, step=epoch)
                     tf.summary.scalar('accuracy', acc_val, step=epoch)
+                #del acc_val
+
                 with grad_summary_writer.as_default():
                     for i,g in enumerate(train_grads):
                         curr_grad = g
@@ -227,9 +244,11 @@ class Trainer:
                         tf.summary.scalar('mean_grad_layer_{}'.format(i+1), mean, step=epoch)
                         tf.summary.scalar('norm_grad_layer_{}'.format(i+1), norm, step=epoch)
                         tf.summary.histogram('grad_histogram_layer_{}'.format(i+1), curr_grad, step=epoch)
-
+                del curr_grad, mean, norm
         ###    ENDING STUFF   ###
             loss[0,epoch], loss[1,epoch] = train_loss, val_loss
+            del train_loss, val_loss
+
 
         tf.keras.utils.plot_model(self.model, to_file='{}.png'.format(self.name), show_shapes=True)
         return loss, self.model

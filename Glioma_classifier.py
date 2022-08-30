@@ -1,6 +1,9 @@
 import numpy as np
 from datetime import datetime
 import os
+import tensorflow as tf
+import random
+
 
 from DataGenerator.FFT_data_generator import*
 from Models.Automap_w_classifier import classifier_1
@@ -22,14 +25,14 @@ from Utils.get_config import get_config
 import warnings
 warnings.filterwarnings("ignore")
 
-def set_seeds(seed=SEED):
+def set_seeds(seed=0):
     os.environ['PYTHONHASHSEED'] = str(seed)
     random.seed(seed)
     tf.random.set_seed(seed)
     np.random.seed(seed)
 
 
-def set_global_determinism(seed=SEED):
+def set_global_determinism(seed=0):
     set_seeds(seed=seed)
 
     os.environ['TF_DETERMINISTIC_OPS'] = '1'
@@ -79,39 +82,45 @@ def main():
             print('Weights saved as: {}'.format(save_name))
 
     np.save(config['run_name']+'_class_loss.npy', loss)
+    del train_data, val_data, trainer, loss
 
     #path_ = os.path.join(path, 'gbm')
     labtest = np.load(os.path.join(path, 'train/train_time_data.npy'), allow_pickle=True)[150][np.newaxis,...]
     np.save('test_reconstruction.npy', model.predict(labtest)[-2])
     np.save('input_reconstruction.npy', labtest)
+    del labtest
 
     ### Validate model
     N1, N2 = config['max_train_spectra'], None
     print('##########################################################################')
     print('Final evaluation:')
     # Internal validation (subset)
-    train_time = np.load(join(config['data_path'], 'train/train_time_data.npy'), allow_pickle=True)[:N1]
-    train_labels = np.load(join(config['data_path'], 'train/train_labels.npy'), allow_pickle=True)[:N1]
-
-    val_time = np.load(join(config['data_path'], 'validate/validate_time_data.npy'), allow_pickle=True)[:N2]
-    val_labels = np.load(join(config['data_path'], 'validate/validate_labels.npy'), allow_pickle=True)[:N2]
 
     test_time = np.load(join(config['data_path'], 'gbm/train/train_time_data.npy'), allow_pickle=True)
     #test_time = np.load(join(config['data_path'], 'tumor/train_time_data.npy'), allow_pickle=True)
     result = (model.predict(test_time)[0] > 0.5) * 1
     print('Just glioma accuracy:', np.sum(result) / len(result))
+    del test_time, result
 
     test_time = np.load(join(config['data_path'], 'healthy/train/train_time_data.npy'), allow_pickle=True)
     #test_time = np.load(join(config['data_path'], 'healthy/train_time_data.npy'), allow_pickle=True)
     result = (model.predict(test_time)[0] > 0.5) * 1
     print('Just healthy accuracy:', np.sum(result) / len(result))
+    del test_time, result
 
     print('Training data:')
+    train_time = np.load(join(config['data_path'], 'train/train_time_data.npy'), allow_pickle=True)[:N1]
+    train_labels = np.load(join(config['data_path'], 'train/train_labels.npy'), allow_pickle=True)[:N1]
     pred = model.predict(train_time)
     evaluate(pred, train_labels, plot_cm=True, name='CM_training', save_pred=True)
+    del train_time, train_labels, pred
+
     print('Validation data:')
+    val_time = np.load(join(config['data_path'], 'validate/validate_time_data.npy'), allow_pickle=True)[:N2]
+    val_labels = np.load(join(config['data_path'], 'validate/validate_labels.npy'), allow_pickle=True)[:N2]
     pred = model.predict(val_time)
     evaluate(pred, val_labels, plot_cm=True, name='CM_validation', save_pred=True)
+    del val_time, val_labels, pred
 
     if config['external_val']:
         # External validation (new set)

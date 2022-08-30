@@ -1,8 +1,6 @@
-from tensorflow.keras.layers import Input, Dense, Reshape, Conv1D, Conv1DTranspose, \
-    Flatten, Layer, BatchNormalization, Activation, Dropout
+from tensorflow.keras.layers import Input, Dense, Reshape,Flatten, Layer, BatchNormalization, Activation, Dropout
 from tensorflow.keras.models import Model
 import tensorflow as tf
-import numpy as np
 
 # Gradient reversal layer
 @tf.custom_gradient
