@@ -22,7 +22,7 @@ def get_batch(batch_size, i, iterations):
 cat = np.concatenate
 
 class DataGenerator:
-    def __init__(self, N=None, use_labels=None):
+    def __init__(self, N=None, use_labels=None, white_noise=None):
         self.use_labels = use_labels
         if N is not None:
             N = int(np.ceil(N/2))
@@ -30,6 +30,13 @@ class DataGenerator:
                          np.load(join(path_h, 'train/train_freq_data.npy'))[:N]
         self.x2, self.y2 = np.load(join(path_g, 'train/train_time_data.npy'))[:N], \
                          np.load(join(path_g, 'train/train_freq_data.npy'))[:N]
+
+        if white_noise is not None:
+            mean = 0
+            std = white_noise
+            self.x1 += np.random.normal(mean, std, size=self.x1.shape)
+            self.x2 += np.random.normal(mean, std, size=self.x2.shape)
+
         if self.use_labels is not None:
             self.labels1 = np.load(join(path_h, 'train/train_labels.npy'), allow_pickle=True)[:N][:,use_labels]
             self.labels2 = np.load(join(path_g, 'train/train_labels.npy'), allow_pickle=True)[:N][:, use_labels]
