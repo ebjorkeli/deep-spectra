@@ -75,11 +75,11 @@ class Trainer:
             self.latent_space = prediction[-1]
             self.labels = data[2]
             prediction = prediction[:-1] # [:-1]!!!
-            if epoch < self.config['pretrain']:
-                self.w[0:3] = [0,0,0]
-                self.w[-1] = self.weights[-1]
-            else:
-                self.w = self.weights
+            #if epoch < self.config['pretrain']:
+            #    self.w[0:3] = [0,0,0]
+            #    self.w[-1] = self.weights[-1]
+            #else:
+            #    self.w = self.weights
                 #self.w[0:3] = self.weights[0:3]
                 #self.w[-1] = 0
 
@@ -87,9 +87,13 @@ class Trainer:
                 losses = self.training_loss(prediction, [data[2], data[0]])  ## labels, time_spectra
             elif self.model_type == 'automap':
                 losses = self.training_loss(prediction, data[2])
+            elif self.model_type == 'densenet':
+                losses = self.training_loss(prediction, data[2])
+
+            opt = optimizer[0]
             # Gradient penalty
             #grads = t.gradient(losses, self.model.trainable_variables)
-            grad_penalty = []
+            #grad_penalty = []
             #for g in grads:
             #    grad_penalty.append(self.gradient_penalty(g))
             #losses[1] += self.lambda_gp * np.asarray(grad_penalty)[0]
@@ -98,22 +102,22 @@ class Trainer:
             #losses = [a+b for a,b in zip(losses, self.lambda_gp*np.asarray(grad_penalty))]
 
         # Now update the gradient
-        if epoch < self.config['pretrain']:
-            opt = optimizer[0]
+        #if epoch < self.config['pretrain']:
+        #    opt = optimizer[0]
         #    for layer in self.model.layers[14:]:
         #        layer.trainable = False
-        else:
-            opt = optimizer[1]
-            for layer in self.model.layers[10:14]:
-                layer.trainable = False
-                if epoch % 2 == 0:
-                    a = [21,25]
-                    for aa in a:
-                        self.model.layers[aa].trainable = False
-                else:
-                    a = [15, 16, 18, 19, 22, 23, 26, 27]
-                    for aa in a:
-                        self.model.layers[aa].trainable = False
+        #else:
+        #    opt = optimizer[1]
+        #    for layer in self.model.layers[10:14]:
+        #        layer.trainable = False
+        #        if epoch % 2 == 0:
+        #            a = [21,25]
+        #            for aa in a:
+        #                self.model.layers[aa].trainable = False
+        #        else:
+        #            a = [15, 16, 18, 19, 22, 23, 26, 27]
+        #            for aa in a:
+        #                self.model.layers[aa].trainable = False
 
         gradients = tape.gradient(losses, self.model.trainable_variables)
         opt.apply_gradients(zip(gradients, self.model.trainable_variables))
@@ -159,7 +163,7 @@ class Trainer:
 
                 ###    EVALUATION STUFF   ###
                 # Evaluate model:
-                train_time = np.load(join(self.path, 'train/train_time_data.npy'), allow_pickle=True)[:self.config['max_train_spectra']]
+                '''train_time = np.load(join(self.path, 'train/train_time_data.npy'), allow_pickle=True)[:self.config['max_train_spectra']]
                 train_labels = np.load(join(self.path, 'train/train_labels.npy'), allow_pickle=True)[:self.config['max_train_spectra']]
                 print('Train set:')
                 pred = self.model.predict(train_time)
@@ -175,7 +179,7 @@ class Trainer:
                 pred = self.model.predict(val_time)
                 acc_val = accuracy(pred, val_labels)
                 print('False negative rate: {}'.format(false_neg_rate(val_labels[:,0], (pred[0] > 0.5)*1)))
-                del val_time, val_labels
+                del val_time, val_labels'''
                 ### EXTERNAL VALIDATION ###
                 '''val_time = np.load(join(self.path, 'nhx/test/test_time_data.npy'), allow_pickle=True)[:None]
                 val_labels = np.load(join(self.path, 'nhx/test/test_labels.npy'), allow_pickle=True)[:None]

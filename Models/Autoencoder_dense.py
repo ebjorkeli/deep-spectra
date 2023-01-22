@@ -43,9 +43,6 @@ def autoencodeclass(input_shape, config):
     x = Dense(2*1024, activation='relu')(x)
     out0 = Reshape((1024, 2))(x)
 
-    #encoded = Encoder(filters=filters, latent_dim=latent_dim, norm=norm, act=activation)(input) # latent space
-    #out0 = Decoder(filters=filters, latent_dim=latent_dim, norm=norm, act=activation)(encoded)                         # recreated spectra
-
     x1 = Flatten()(encoded)
     #x2 = Flatten()(out0)
 

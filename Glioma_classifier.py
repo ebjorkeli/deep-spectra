@@ -3,18 +3,20 @@ from datetime import datetime
 import os
 import tensorflow as tf
 import random
+import matplotlib.pyplot as plt
 
 
-from DataGenerator.FFT_data_generator import*
+from DataGenerator.FFT_data_generator2 import *
 from Models.Automap_w_classifier import classifier_1
 #from Models.Autoencoder_v1 import *
 #from Models.Autoencoder_v2 import *
-from Models.Autoencoder_dense import *
-#from Models.Autoencoder_lstm import *
+#from Models.Autoencoder_dense import *
+#from Models.DenseNet_adp import *
+from Models.DenseNet_class import *
 #from Trainers.Class_trainer_v2 import Trainer
 from Trainers.Class_trainer import Trainer
 
-tf.config.experimental_run_functions_eagerly(True)
+#tf.config.experimental_run_functions_eagerly(True)
 #tf.config.run_functions_eagerly(True)
 
 from Utils.evaluation import evaluate
@@ -54,22 +56,41 @@ def main():
     config['datetime'] = str(datetime.now())
 
     # Data loader
-    if config['model'] == 'autoencoder': # labels: 0=glioma, 1=PID, 2=MID
+    if config['model'] == 'autoencoder': # labels: 0=glioma, 1=PID, 2=MID, 3=IDH
         config['labels'] = [0,1,2]
+    elif config['model'] == 'densenet':
+        config['labels'] = [0,3]
     else:
         config['labels'] = [0]
 
-    train_data = DataGenerator(N=config['max_train_spectra'], use_labels=config['labels'])
-    val_data   = ValGenerator(N=config['max_val_spectra'], use_labels=config['labels'])
+    #config['labels'] = None
+
+    train_data = DataGenerator(config['batch_size'], N=config['max_train_spectra'], use_labels=config['labels'])
+    val_data   = ValGenerator(config['batch_size'], N=config['max_val_spectra'], use_labels=config['labels'])
     # Set up model
     dim = train_data.dim   #train_data[0].shape # N*t*2 (N,1024,2)
     if config['model'] == 'automap':
         model = classifier_1(dim[1:], 1, config)
     elif config['model'] == 'autoencoder':
         model = autoencodeclass(dim[1:], config)
+    elif config['model'] == 'densenet':
+        model = densenet(dim[1:], [1024,1], f=4)
 
-    trainer = Trainer(model, train_data, val_data, config)
-    loss, model = trainer.train()
+    #trainer = Trainer(model, train_data, val_data, config)
+
+    # Alternative training (for densenet++)
+    opt = tf.keras.optimizers.Adam(learning_rate=config['learning_rate'])
+    model.compile(opt,
+                  loss={#'domain_output' : tf.keras.losses.MeanSquaredError(),})
+                        'glioma_output' : tf.keras.losses.BinaryCrossentropy(),
+                        'idhmut_output' : tf.keras.losses.BinaryCrossentropy()},
+                  metrics={'glioma_output' : 'accuracy',
+                           'idhmut_output' : 'accuracy'})
+    history = model.fit(x=train_data,
+                        steps_per_epoch=dim[0] // config['batch_size'],
+                        epochs=config['max_epochs'],
+                        validation_data=val_data,
+                        validation_steps=val_data.dim[0] // config['batch_size'])
 
     if config['save_model']:
         try:
@@ -81,14 +102,19 @@ def main():
             model.save_weights(save_name)
             print('Weights saved as: {}'.format(save_name))
 
-    np.save(config['run_name']+'_class_loss.npy', loss)
-    del train_data, val_data, trainer, loss
+    #plt.plot(history.history['loss'])
+    #plt.show()
+    plt.plot(history.history['glioma_output_loss'])
+    plt.show()
+    plt.plot(history.history['idhmut_output_loss'])
+    plt.show()
+
+    np.save(config['run_name']+'_class_history.npy', history.history["loss"])
 
     #path_ = os.path.join(path, 'gbm')
     labtest = np.load(os.path.join(path, 'train/train_time_data.npy'), allow_pickle=True)[150][np.newaxis,...]
     np.save('test_reconstruction.npy', model.predict(labtest)[-2])
     np.save('input_reconstruction.npy', labtest)
-    del labtest
 
     ### Validate model
     N1, N2 = config['max_train_spectra'], None
@@ -100,27 +126,23 @@ def main():
     #test_time = np.load(join(config['data_path'], 'tumor/train_time_data.npy'), allow_pickle=True)
     result = (model.predict(test_time)[0] > 0.5) * 1
     print('Just glioma accuracy:', np.sum(result) / len(result))
-    del test_time, result
 
     test_time = np.load(join(config['data_path'], 'healthy/train/train_time_data.npy'), allow_pickle=True)
     #test_time = np.load(join(config['data_path'], 'healthy/train_time_data.npy'), allow_pickle=True)
     result = (model.predict(test_time)[0] > 0.5) * 1
     print('Just healthy accuracy:', np.sum(result) / len(result))
-    del test_time, result
 
     print('Training data:')
     train_time = np.load(join(config['data_path'], 'train/train_time_data.npy'), allow_pickle=True)[:N1]
     train_labels = np.load(join(config['data_path'], 'train/train_labels.npy'), allow_pickle=True)[:N1]
     pred = model.predict(train_time)
     evaluate(pred, train_labels, plot_cm=True, name='CM_training', save_pred=True)
-    del train_time, train_labels, pred
 
     print('Validation data:')
     val_time = np.load(join(config['data_path'], 'validate/validate_time_data.npy'), allow_pickle=True)[:N2]
     val_labels = np.load(join(config['data_path'], 'validate/validate_labels.npy'), allow_pickle=True)[:N2]
     pred = model.predict(val_time)
     evaluate(pred, val_labels, plot_cm=True, name='CM_validation', save_pred=True)
-    del val_time, val_labels, pred
 
     if config['external_val']:
         # External validation (new set)

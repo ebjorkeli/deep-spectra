@@ -51,14 +51,67 @@ class LoadData:
     def load_all(self, type='all', extra_gbm=False):
         data, keys= [], []
         if type == 'all':
-            files = ['Spec_GBM_7939_1024.mat', 'Spec_Healthy_volunteer_11251_1024.mat', 'Healthy_subj018_3M.mat',
-                     'Healthy_subj0137_3M.mat', 'Healthy_subj199_3M.mat', 'Healthy_subj018_5M.mat',
-                     'Healthy_subj0137_5M.mat', 'Healthy_subj199_5M.mat', 'MRSI_2D_FACBC_glioma_002_33.mat',
-                     'MRSI_2D_FACBC_glioma_002_37.mat', 'MRSI_2D_FACBC_glioma_004_24.mat', 'MRSI_2D_FACBC_glioma_005_21.mat',
-                     'MRSI_2D_FACBC_glioma_007_22.mat', 'MRSI_2D_FACBC_glioma_007_23.mat', 'MRSI_2D_FACBC_glioma_008_22.mat',
-                     'MRSI_2D_FACBC_glioma_009_22.mat', 'MRSI_2D_FACBC_glioma_009_23.mat', 'MRSI_2D_FACBC_glioma_010_22.mat',
-                     'MRSI_2D_FACBC_glioma_010_23.mat', 'MRSI_2D_FACBC_glioma_011_39.mat']
-            keys += ['Spec']*2 + ['MRSI_2d']*18
+            files = ['Spec_GBM_7939_1024.mat',
+                     'Healthy_subj018_3M.mat', 'Healthy_subj0137_3M.mat','Healthy_subj199_3M.mat',
+                     'Healthy_subj018_5M.mat', 'Healthy_subj0137_5M.mat', 'Healthy_subj199_5M.mat',
+                     'Spec_Healthy_volunteer_11251_1024.mat',
+                     'MRSI_2D_FACBC_glioma_002_33.mat', 'MRSI_2D_FACBC_glioma_002_37.mat',
+                     'MRSI_2D_FACBC_glioma_004_24.mat', 'MRSI_2D_FACBC_glioma_005_21.mat',
+                     'MRSI_2D_FACBC_glioma_007_22.mat', 'MRSI_2D_FACBC_glioma_007_23.mat',
+                     'MRSI_2D_FACBC_glioma_008_22.mat', 'MRSI_2D_FACBC_glioma_009_22.mat',
+                     'MRSI_2D_FACBC_glioma_009_23.mat', 'MRSI_2D_FACBC_glioma_010_22.mat',
+                     'MRSI_2D_FACBC_glioma_010_23.mat', 'MRSI_2D_FACBC_glioma_011_39.mat',
+                     'Tumor__NOfilt_GLIOM__001.mat', 'Tumor__filt100__GLIOM__001.mat',  'Tumor__filt150__GLIOM__001.mat',
+                     'Tumor__NOfilt__GLIOM__O_001.mat', 'Tumor__filt100__GLIOM__O_001.mat', 'Tumor__filt150__GLIOM__O_001.mat',
+                     'Tumor__NOfilt__GLIOM__002.mat', 'Tumor__filt150__GLIOM__002.mat',
+                     'Tumor__NOfilt__GLIOM__O_002.mat', 'Tumor__filt100__GLIOM__O_002.mat', 'Tumor__filt150__GLIOM__O_002.mat',
+                     'Tumor__NOfilt__GLIOM__003.mat', 'Tumor__filt100__GLIOM__003.mat', 'Tumor__filt150__GLIOM__003.mat',
+                     'Tumor__NOfilt__GLIOM__004.mat', 'Tumor__filt100__GLIOM__004.mat', 'Tumor__filt150__GLIOM__004.mat',
+                     'Tumor__NOfilt__GLIOM__005.mat', 'Tumor__filt100__GLIOM__005.mat', 'Tumor__filt150__GLIOM__005.mat',
+                     'Tumor__NOfilt__GLIOM__O_005.mat', 'Tumor__filt100__GLIOM__O_005.mat', 'Tumor__filt150__GLIOM__O_005.mat',
+                     'Tumor__NOfilt__GLIOM__006.mat', 'Tumor__filt100__GLIOM__006.mat', 'Tumor__filt150__GLIOM__006.mat',
+                     'Tumor__NOfilt__GLIOM__O_006.mat', 'Tumor__filt100__GLIOM__O_006.mat', 'Tumor__filt150__GLIOM__O_006.mat',
+                     'Tumor__NOfilt__GLIOM__007.mat', 'Tumor__filt100__GLIOM__007.mat', 'Tumor__filt150__GLIOM__007.mat',
+                     'Tumor__NOfilt__GLIOM__R_007.mat', 'Tumor__filt100__GLIOM__R_007.mat', 'Tumor__filt150__GLIOM__R_007.mat',
+                     'Tumor__NOfilt__GLIOM__O_007.mat', 'Tumor__filt100__GLIOM__O_007.mat', 'Tumor__filt150__GLIOM__O_007.mat',
+                     'Tumor__NOfilt__GLIOM__008.mat', 'Tumor__filt100__GLIOM__008.mat', 'Tumor__filt150__GLIOM__008.mat',
+                     'Tumor__NOfilt__GLIOM__O_008.mat', 'Tumor__filt100__GLIOM__O_008.mat', 'Tumor__filt150__GLIOM__O_008.mat',
+                     'Tumor__NOfilt__GLIOM__009.mat', 'Tumor__filt100__GLIOM__009.mat', 'Tumor__filt150__GLIOM__009.mat',
+                     'Tumor__NOfilt__GLIOM__O_009.mat', 'Tumor__filt100__GLIOM__O_009.mat', 'Tumor__filt150__GLIOM__O_009.mat',
+                     'Tumor__NOfilt__GLIOM__010.mat', 'Tumor__filt100__GLIOM__010.mat', 'Tumor__filt150__GLIOM__010.mat',
+                     'Tumor__NOfilt__GLIOM__O_010.mat', 'Tumor__filt100__GLIOM__O_010.mat', 'Tumor__filt150__GLIOM__O_010.mat',
+                     'Tumor__NOfilt__GLIOM__011.mat', 'Tumor__filt100__GLIOM__011.mat', 'Tumor__filt150__GLIOM__011.mat',
+                     'Tumor__NOfilt__GLIOM__O_011.mat', 'Tumor__filt100__GLIOM__O_011.mat', 'Tumor__filt150__GLIOM__O_011.mat',
+                     'Tumor__NOfilt__GLIOM__012.mat', 'Tumor__filt100__GLIOM__012.mat', 'Tumor__filt150__GLIOM__012.mat',
+                     'Tumor__NOfilt__GLIOM__013.mat', 'Tumor__filt100__GLIOM__013.mat', 'Tumor__filt150__GLIOM__013.mat',
+                     'Tumor__NOfilt__GLIOM__014.mat', 'Tumor__filt100__GLIOM__014.mat', 'Tumor__filt150__GLIOM__014.mat',
+                     'Tumor__NOfilt__GLIOM__015.mat', 'Tumor__filt100__GLIOM__015.mat', 'Tumor__filt150__GLIOM__015.mat',
+                     'Tumor__NOfilt__GLIOM__O_015.mat', 'Tumor__filt100__GLIOM__O_015.mat', 'Tumor__filt150__GLIOM__O_015.mat',
+                     'Tumor__NOfilt__GLIOM__016.mat', 'Tumor__filt100__GLIOM__016.mat', 'Tumor__filt150__GLIOM__016.mat',
+                     'Tumor__NOfilt__GLIOM__019.mat', 'Tumor__filt100__GLIOM__019.mat', 'Tumor__filt150__GLIOM__019.mat',
+                     'Tumor__NOfilt__GLIOM__O_101.mat', 'Tumor__filt100__GLIOM__O_101.mat', 'Tumor__filt150__GLIOM__O_101.mat',
+                     'Tumor__NOfilt__GLIOM__O_102.mat', 'Tumor__filt100__GLIOM__O_102.mat', 'Tumor__filt150__GLIOM__O_102.mat',
+                     'Tumor__NOfilt__GLIOM__O_103.mat', 'Tumor__filt100__GLIOM__O_103.mat', 'Tumor__filt150__GLIOM__O_103.mat'
+                     'Tumor__NOfilt__GLIOM__104.mat', 'Tumor__filt100__GLIOM__104.mat', 'Tumor__filt150__GLIOM__104.mat',
+                     'Tumor__NOfilt__GLIOM__105.mat', 'Tumor__filt100__GLIOM__105.mat', 'Tumor__filt150__GLIOM__105.mat',
+                     'Tumor__NOfilt__GLIOM__O_105.mat', 'Tumor__filt100__GLIOM__O_105.mat', 'Tumor__filt150__GLIOM__O_105.mat',
+                     'Tumor__NOfilt__GLIOM__106.mat', 'Tumor__filt100__GLIOM__106.mat', 'Tumor__filt150__GLIOM__106.mat',
+                     'Tumor__NOfilt__GLIOM__109.mat', 'Tumor__filt100__GLIOM__109.mat', 'Tumor__filt150__GLIOM__109.mat',
+                     'Tumor__NOfilt__GLIOM__110.mat', 'Tumor__filt100__GLIOM__110.mat', 'Tumor__filt150__GLIOM__110.mat',
+                     'Tumor__NOfilt__GLIOM__111.mat', 'Tumor__filt100__GLIOM__111.mat', 'Tumor__filt150__GLIOM__111.mat',
+                     'Tumor__NOfilt__GLIOM__115.mat', 'Tumor__filt100__GLIOM__115.mat', 'Tumor__filt150__GLIOM__115.mat',
+                     'Tumor__NOfilt__GLIOM__116.mat', 'Tumor__filt100__GLIOM__116.mat', 'Tumor__filt150__GLIOM__116.mat',
+                     'Tumor__NOfilt__GLIOM__118.mat', 'Tumor__filt100__GLIOM__118.mat', 'Tumor__filt150__GLIOM__118.mat',
+                     ]
+            keys += ['Spec']*2 + ['MRSI_2d']*18 + ['GLIOM__001']*3 + ['GLIOM__O_001']*3 + ['GLIOM__002']*2 +\
+                    ['GLIOM__O_002']*3 + ['GLIOM__003']*3 + ['GLIOM__004']*3 + ['GLIOM__005']*3 + ['GLIOM__O_005']*3 +\
+                    ['GLIOM__006']*3 + ['GLIOM__O_006']*3 + ['GLIOM__007']*3 + ['GLIOM__R_007']*3 + ['GLIOM__O_007']*3 +\
+                    ['GLIOM__008']*3 + ['GLIOM__O_008']*3 + ['GLIOM__009']*3 + ['GLIOM__O_009']*3 + ['GLIOM__010']*3 +\
+                    ['GLIOM__O_010']*3 + ['GLIOM__011']*3 + ['GLIOM__O_011']*3 + ['GLIOM__012']*3 + ['GLIOM__013']*3 +\
+                    ['GLIOM__014']*3 + ['GLIOM__015']*3 + ['GLIOM__O_015']*3 +  ['GLIOM__016']*3 + ['GLIOM__019']*3 +\
+                    ['GLIOM__101']*3 + ['GLIOM__102']*3 + ['GLIOM__103']*3 + ['GLIOM__104']*3 + ['GLIOM__105']*3 +\
+                    ['GLIOM__O_105']*3 + ['GLIOM__106']*3 + ['GLIOM__109']*3 + ['GLIOM__110']*3 + ['GLIOM__111']*3 + \
+                    ['GLIOM__115']*3 + ['GLIOM__116']*3 + ['GLIOM__119']*3
         elif type == 'gbm':
             # Load just glioblastoma
             files = ['Spec_GBM_7939_1024.mat'] + extra_gbm * ['MRSI_2D_FACBC_glioma_002_33.mat',

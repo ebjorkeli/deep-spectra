@@ -144,9 +144,9 @@ def autoencodeclass(input_shape, config):
     c0_1 = BatchNormalization()(c0_0)
     out1 = Dense(1, activation='sigmoid', use_bias=True)(c0_1) # what are fed into the activations, plot or log...
 
-    # Is mutation (0-1):xs
-    #x = Dense(1024, activation='relu', use_bias=True)(x)
-    #out2 = Dense(1, activation='sigmoid', use_bias=True)(x)
+    #Is mutation (0-1):xs
+    c_3_0 = Dense(1024, activation='relu', use_bias=True)(x)
+    out2 = Dense(1, activation='sigmoid', use_bias=True)(x)
 
 
     # Is patient (0-5): should be adversary / discriminator
