@@ -7,14 +7,8 @@ import matplotlib.pyplot as plt
 
 
 from DataGenerator.FFT_data_generator2 import *
-from Models.Automap_w_classifier import classifier_1
-#from Models.Autoencoder_v1 import *
-#from Models.Autoencoder_v2 import *
-#from Models.Autoencoder_dense import *
-#from Models.DenseNet_adp import *
+#from Models.Automap_w_classifier import classifier_1
 from Models.DenseNet_class import *
-#from Trainers.Class_trainer_v2 import Trainer
-from Trainers.Class_trainer import Trainer
 
 #tf.config.experimental_run_functions_eagerly(True)
 #tf.config.run_functions_eagerly(True)
@@ -111,58 +105,6 @@ def main():
 
     np.save(config['run_name']+'_class_history.npy', history.history["loss"])
 
-    """
-    #path_ = os.path.join(path, 'gbm')
-    labtest = np.load(os.path.join(path, 'train/train_time_data.npy'), allow_pickle=True)[150][np.newaxis,...]
-    np.save('test_reconstruction.npy', model.predict(labtest)[-2])
-    np.save('input_reconstruction.npy', labtest)
-
-    ### Validate model
-    N1, N2 = config['max_train_spectra'], None
-    print('##########################################################################')
-    print('Final evaluation:')
-    # Internal validation (subset)
-
-    test_time = np.load(join(config['data_path'], 'gbm/train/train_time_data.npy'), allow_pickle=True)
-    #test_time = np.load(join(config['data_path'], 'tumor/train_time_data.npy'), allow_pickle=True)
-    result = (model.predict(test_time)[0] > 0.5) * 1
-    print('Just glioma accuracy:', np.sum(result) / len(result))
-
-    test_time = np.load(join(config['data_path'], 'healthy/train/train_time_data.npy'), allow_pickle=True)
-    #test_time = np.load(join(config['data_path'], 'healthy/train_time_data.npy'), allow_pickle=True)
-    result = (model.predict(test_time)[0] > 0.5) * 1
-    print('Just healthy accuracy:', np.sum(result) / len(result))
-
-    print('Training data:')
-    train_time = np.load(join(config['data_path'], 'train/train_time_data.npy'), allow_pickle=True)[:N1]
-    train_labels = np.load(join(config['data_path'], 'train/train_labels.npy'), allow_pickle=True)[:N1]
-    pred = model.predict(train_time)
-    evaluate(pred, train_labels, plot_cm=True, name='CM_training', save_pred=True)
-
-    print('Validation data:')
-    val_time = np.load(join(config['data_path'], 'validate/validate_time_data.npy'), allow_pickle=True)[:N2]
-    val_labels = np.load(join(config['data_path'], 'validate/validate_labels.npy'), allow_pickle=True)[:N2]
-    pred = model.predict(val_time)
-    evaluate(pred, val_labels, plot_cm=True, name='CM_validation', save_pred=True)
-
-    if config['external_val']:
-        # External validation (new set)
-        test_time = np.load(join(config['data_path'], 'test/test_time_data.npy'), allow_pickle=True)[:N2]
-        test_labels = np.load(join(config['data_path'], 'test/test_labels.npy'), allow_pickle=True)[:N2]
-
-        print('External data:')
-        pred = model.predict(test_time)
-        evaluate(pred, test_labels, plot_cm=True, name='CM_test_nhx')
-
-        test_time = np.load(join(config['data_path'], 'test_gbm/test_time_data.npy'), allow_pickle=True)
-        # test_time = np.load(join(config))
-        result = (model.predict(test_time)[0] > 0.5) * 1
-        print('EXT  Just glioma accuracy:', np.sum(result) / len(result))
-
-        test_time = np.load(join(config['data_path'], 'test_healthy/test_time_data.npy'), allow_pickle=True)
-        result = (model.predict(test_time)[0] > 0.5) * 1
-        print('EXT  Just healthy accuracy:', np.sum(result) / len(result))
-    """
 
 if __name__ == '__main__':
     main()
