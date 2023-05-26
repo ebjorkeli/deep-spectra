@@ -111,6 +111,7 @@ def main():
 
     np.save(config['run_name']+'_class_history.npy', history.history["loss"])
 
+    """
     #path_ = os.path.join(path, 'gbm')
     labtest = np.load(os.path.join(path, 'train/train_time_data.npy'), allow_pickle=True)[150][np.newaxis,...]
     np.save('test_reconstruction.npy', model.predict(labtest)[-2])
@@ -161,7 +162,7 @@ def main():
         test_time = np.load(join(config['data_path'], 'test_healthy/test_time_data.npy'), allow_pickle=True)
         result = (model.predict(test_time)[0] > 0.5) * 1
         print('EXT  Just healthy accuracy:', np.sum(result) / len(result))
-
+    """
 
 if __name__ == '__main__':
     main()
